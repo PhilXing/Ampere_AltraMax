@@ -8,6 +8,6 @@ make -f $WORKSPACE/edk2-ampere-tools/Makefile \
     SCP_SLIM=$WORKSPACE/srp-ac02-fw-edk2-src-r2.03.20210910/altra_firmware_sdk/bin/scp/altra_scp_signed_2.03.20210719.slim \
     LINUXBOOT_BIN=$WORKSPACE/flashkernel \
     VER=1.07 BUILD=300 \
-    all
+    tianocore_img
     # PACKAGES_PATH=$WORKSPACE/adlink-platforms:"${PACKAGES_PATH}" \
 export PATH=$OPATH
