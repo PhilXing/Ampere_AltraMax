@@ -1,0 +1,148 @@
+## @file
+#
+# Copyright (c) 2020 - 2021, Ampere Computing LLC. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001B
+  PACKAGE_NAME                   = AmpereSiliconPkg
+  PACKAGE_GUID                   = F9EB69A8-7569-4C0E-87D1-3CC9EB7CBF09
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[LibraryClasses]
+  ##  @libraryclass  Provides functions to create the ACPI PCCT Table which which advertises PCC mailbox channel information.
+  AcpiPccLib|Silicon/Ampere/AmpereSiliconPkg/Include/Library/AcpiPccLib.h
+
+  ##  @libraryclass  Provides helper functions to update ACPI DSDT Table.
+  AcpiHelperLib|Silicon/Ampere/AmpereSiliconPkg/Include/Library/AcpiHelperLib.h
+
+[Guids]
+  gAmpereTokenSpaceGuid = { 0xdbd4436e, 0x89cb, 0x44dc, { 0xb5, 0xc0, 0x49, 0xc3, 0x91, 0x35, 0xbf, 0xdf } }
+
+  #
+  # Platform Manager formset UUID
+  #
+  gPlatformManagerFormsetGuid  = { 0x83ABD546, 0x7AD9, 0x4DE7, { 0xBD, 0x52, 0x12, 0x23, 0xF6, 0xE8, 0xFD, 0x4B } }
+
+  #
+  # Platform Manager entry UUID
+  #
+  gPlatformManagerEntryEventGuid = { 0x28A4731E, 0x14A9, 0x488A, { 0xA8, 0x19, 0xFF, 0x27, 0x80, 0x6E, 0xDB, 0x0E } }
+
+  #
+  # Platform Manager exit UUID
+  #
+  gPlatformManagerExitEventGuid  = { 0xE8887242, 0x4EFF, 0x4323, { 0x81, 0xF4, 0xC9, 0x5F, 0xD5, 0x8D, 0x80, 0xD5 } }
+
+  #
+  # BMC Managment Screen UUID
+  gBmcInfoScreenFormSetGuid = { 0xC4D6ED50, 0x769D, 0x4319, { 0xEB, 0xB7, 0xCC, 0xDD, 0xC8, 0x9D, 0x3D, 0x2D } }
+
+[Ppis]
+
+[PcdsFixedAtBuild]
+  #
+  # SMpro PMpro Pcds
+  #
+  gAmpereTokenSpaceGuid.PcdSmproDbBaseReg|0x100000540000|UINT64|0x00000001
+  gAmpereTokenSpaceGuid.PcdSmproEfuseShadow0|0x10000054a000|UINT64|0x00000002
+  gAmpereTokenSpaceGuid.PcdSmproNsMailboxIndex|0x1|UINT32|0x00000003
+  gAmpereTokenSpaceGuid.PcdPmproDbBaseReg|0x100001540000|UINT64|0x00000004
+
+  #
+  # SMBIOS Type 1 Pcd
+  #
+  gAmpereTokenSpaceGuid.PcdSmbiosTables1MajorVersion|0|UINT8|0x00000005
+  gAmpereTokenSpaceGuid.PcdSmbiosTables1MinorVersion|0|UINT8|0x00000006
+
+  #
+  # SMBus
+  #
+  gAmpereTokenSpaceGuid.PcdSmbusI2cBusNumber|0x00|UINT8|0x00000007
+  gAmpereTokenSpaceGuid.PcdSmbusI2cBusSpeed|100000|UINT32|0x00000008 # Hz
+
+  #
+  # BMC
+  #
+  gAmpereTokenSpaceGuid.PcdBmcSlaveAddr|0x10|UINT8|0x00000009
+  gAmpereTokenSpaceGuid.PcdBmcReadyGpio|18|UINT8|0x0000000A
+
+  #
+  # IPMI
+  #
+  gAmpereTokenSpaceGuid.PcdIpmiLunNumber|0|UINT8|0x000000B
+  gAmpereTokenSpaceGuid.PcdIpmiSsifRequestRetryCount|5|UINT8|0x00000C
+  gAmpereTokenSpaceGuid.PcdIpmiSsifRequestRetryInterval|60000|UINT32|0x0000000D # 60ms - 250ms
+  gAmpereTokenSpaceGuid.PcdIpmiSsifResponseRetryCount|250|UINT8|0x00000E
+  gAmpereTokenSpaceGuid.PcdIpmiSsifResponseRetryInterval|20000|UINT32|0x0000000F # 20ms
+
+[PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx]
+  #
+  # Firmware Volume Pcds
+  #
+  gAmpereTokenSpaceGuid.PcdFvBlockSize|0|UINT32|0xB0000001
+
+  #
+  # SMBIOS, default or template values
+  #
+  # SMBIOS Type 0 - BIOS Information
+  gAmpereTokenSpaceGuid.PcdSmbiosTables0BiosReleaseDate|"MM/DD/YYYY"|VOID*|0xB0000002 # Must follow this MM/DD/YYYY SMBIOS date format
+
+  # NVRam Pcds
+  gAmpereTokenSpaceGuid.PcdNvramErased|FALSE|BOOLEAN|0xB0000009
+
+  # Pcie HotPlug reset map
+  gAmpereTokenSpaceGuid.gPcieHotPlugGpioResetMap|0x0|UINT8|0xB000000A
+
+  ## Platform level Redfish Service control PCD
+  # These PCDs are used to stop the Redfish sevice when secure boot is disabled
+  # or exit boot service.
+  gAmpereTokenSpaceGuid.PcdRedfishServiceStopIfSecureBootDisabled|TRUE|BOOLEAN|0xB0000010
+  gAmpereTokenSpaceGuid.PcdRedfishServiceStopIfExitbootService|TRUE|BOOLEAN|0xB0000011
+  ##
+  # edk2 Redfish implementation on Emulator package is designed to access
+  # to Redfish simulator.
+  # https://github.com/DMTF/Redfish-Profile-Simulator
+  # The user ID and password are fixed as below.
+  gAmpereTokenSpaceGuid.PcdRedfishServiceUserId|"root"|VOID*|0xB0000012
+  gAmpereTokenSpaceGuid.PcdRedfishServicePassword|"0penBmc"|VOID*|0xB0000013
+
+[PcdsDynamic, PcdsDynamicEx]
+  # FRU Chassis Information
+  gAmpereTokenSpaceGuid.PcdFruChassisPartNumber|"To be filled by O.E.M.                             "|VOID*|0xB0000021
+  gAmpereTokenSpaceGuid.PcdFruChassisSerialNumber|"To be filled by O.E.M.                             "|VOID*|0xB0000022
+  gAmpereTokenSpaceGuid.PcdFruChassisExtra|"To be filled by O.E.M.                             "|VOID*|0xB0000023
+
+  # FRU Board Information
+  gAmpereTokenSpaceGuid.PcdFruBoardManufacturerName|"To be filled by O.E.M.                             "|VOID*|0xB0000031
+  gAmpereTokenSpaceGuid.PcdFruBoardProductName|"To be filled by O.E.M.                             "|VOID*|0xB0000032
+  gAmpereTokenSpaceGuid.PcdFruBoardSerialNumber|"To be filled by O.E.M.                             "|VOID*|0xB0000033
+  gAmpereTokenSpaceGuid.PcdFruBoardPartNumber|"To be filled by O.E.M.                             "|VOID*|0xB0000034
+
+  # FRU Product Information
+  gAmpereTokenSpaceGuid.PcdFruProductManufacturerName|"To be filled by O.E.M.                             "|VOID*|0xB0000041
+  gAmpereTokenSpaceGuid.PcdFruProductName|"To be filled by O.E.M.                             "|VOID*|0xB0000042
+  gAmpereTokenSpaceGuid.PcdFruProductPartNumber|"To be filled by O.E.M.                             "|VOID*|0xB0000043
+  gAmpereTokenSpaceGuid.PcdFruProductVersion|"To be filled by O.E.M.                             "|VOID*|0xB0000044
+  gAmpereTokenSpaceGuid.PcdFruProductSerialNumber|"To be filled by O.E.M.                             "|VOID*|0xB0000045
+  gAmpereTokenSpaceGuid.PcdFruProductAssetTag|"To be filled by O.E.M.                             "|VOID*|0xB0000046
+  gAmpereTokenSpaceGuid.PcdFruProductFruFileId|"To be filled by O.E.M.                             "|VOID*|0xB0000047
+  gAmpereTokenSpaceGuid.PcdFruProductExtra|"To be filled by O.E.M.                             "|VOID*|0xB0000048
+
+  # FRU MultiRecord
+  gAmpereTokenSpaceGuid.PcdFruSystemUniqueID|{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }|VOID*|0xB0000049

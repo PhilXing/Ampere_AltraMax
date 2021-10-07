@@ -1,0 +1,41 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_STRATEGY: clone
+  GIT_DEPTH: 0
+  XZ_DEFAULTS: '-T 0'
+
+CI-MR:
+  tags:
+  - edk2
+  only:
+  - merge_requests
+  # Uncomment if you allow cr-mr failure
+  # allow_failure: true
+  script:
+  - EDK2_BRANCH=${EDK2_BRANCH:-main}
+  - NON_OSI_BRANCH=${NON_OSI_BRANCH:-main}
+  - ATF_VERSION=${ATF_VERSION:-1.01.20201019}
+  - PLATFORM=${PLATFORM:-jade}
+  - SOC=${SOC:-altra}
+  - ATF_NAME=${SOC}_atf_${ATF_VERSION}
+  - AMP_TOOLCHAIN_VER=${AMP_TOOLCHAIN_VER:-8.3.0}
+  - CROSS_COMPILER_PATH=/tools/theobroma/gcc/${AMP_TOOLCHAIN_VER}/bin
+  - export PATH=${CROSS_COMPILER_PATH}:$PATH
+  - PLATFORM_UFL=`echo ${PLATFORM} | sed 's/.*/\u&/'`
+  - ROOTDIR=`pwd`
+  - EDK2_SRCDIR=${ROOTDIR}/edk2
+  - NON_OSI_DIR=${ROOTDIR}/edk2-non-osi
+  - EDK2_PLATFORMS_SRCDIR=${ROOTDIR}
+  - BASE_COMMIT=$(git merge-base HEAD origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME})
+  - COMMIT_COUNT=$(git rev-list --count ${BASE_COMMIT}..HEAD)
+  - git config --global url.git@gitlab.com:cmocka/cmocka.git.insteadOf https://git.cryptomilk.org/projects/cmocka.git
+  - git clone --recurse-submodules --single-branch --branch ${EDK2_BRANCH} git@gitlab.com:AmpereComputing/firmware/tianocore/edk2.git
+  - git clone --recurse-submodules --single-branch --branch ${NON_OSI_BRANCH} git@gitlab.com:AmpereComputing/firmware/tianocore/edk2-non-osi.git
+  - git clone git@gitlab.com:AmpereComputing/firmware/tianocore/edk2-ampere-tools.git
+  - python edk2/BaseTools/Scripts/PatchCheck.py -${COMMIT_COUNT}
+  - wget -q --no-check-certificate -O ${ATF_NAME}.tar.xz https://den-swweb.amperecomputing.com/ampsw/builds/internal/${PLATFORM}/fw/${ATF_VERSION}/${ATF_NAME}.tar.xz
+  - tar xf ${ATF_NAME}.tar.xz
+  - ./edk2-ampere-tools/edk2-build.sh -b RELEASE ${PLATFORM_UFL} --atf-image ${ATF_NAME}/${ATF_NAME}.slim --edk2-dir ${EDK2_SRCDIR} --non-osi-dir ${NON_OSI_DIR} --platforms-dir ${EDK2_PLATFORMS_SRCDIR}
+  # Build LinuxBoot
+  - touch flashkernel_dummy
+  - ./edk2-ampere-tools/edk2-build.sh -b RELEASE ${PLATFORM_UFL} --atf-image ${ATF_NAME}/${ATF_NAME}.slim --edk2-dir ${EDK2_SRCDIR} --non-osi-dir ${NON_OSI_DIR} --platforms-dir ${EDK2_PLATFORMS_SRCDIR} --linuxboot --linuxboot-bin flashkernel_dummy

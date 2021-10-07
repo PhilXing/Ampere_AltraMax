@@ -1,0 +1,4 @@
+29f8c642ff08d6f08475d590723f9c90  altra_atf_signed_2.03.20210719.slim
+e1ae338ee56754f6c89bbb0e788dd973  jade_board_setting.bin
+893bdb3ad1c2d8262a5ab9e930510964  jade_board_setting.txt
+7f6231c5f94af2ff9d3a8b6b4bc0659c  nvparam.py
